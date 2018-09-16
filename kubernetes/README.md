@@ -1,8 +1,8 @@
-Regenerate `service.yml` from this directory with
+Regenerate `libri.yml` from this directory with
 ```bash
-go run *.go [flags]
+./gen-gcp
 ```
-For example, to generate a local cluster config
+To apply these changes run
 ```bash
-go run *.go --localCluster
+./apply
 ```

@@ -25,8 +25,8 @@ const (
 	gcpClusterFlag      = "gcpCluster"
 	nLibrariansFlag     = "nLibrarians"
 
-	serviceConfigTemplateFilename = "service.yml.template"
-	serviceConfigFilename         = "service.yml"
+	serviceConfigTemplateFilename = "libri.template.yml"
+	serviceConfigFilename         = "libri.yml"
 )
 
 // KubeConfig contains the configuration to apply to the template.
