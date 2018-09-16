@@ -1,0 +1,185 @@
+{{/* the next line is obviously just for the generated file, not this template */}}
+# This file is generated from service.yml.template. Please edit that instead and regenerate.
+{{ $libriVersion := .LibriVersion -}}
+{{ $diskSize := .DiskSize -}}
+{{ $localPort := .LocalPort -}}
+{{ $localMetricsPort := .LocalMetricsPort -}}
+{{ $gcpCluster := .GCPCluster -}}
+{{ $localCluster := .LocalCluster -}}
+{{ $cpuLimit := .CPULimit -}}
+{{ $ramLimit := .RAMLimit -}}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: libri-experimenter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: User
+  name: libri-admin@elixir-deploy-staging-1.iam.gserviceaccount.com
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: default-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+---
+# headless service for internal DNS networking
+kind: Service
+apiVersion: v1
+metadata:
+  name: libri
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ $localPort }}
+  selector:
+    app: libri
+---
+{{ range $index, $librarian := .Librarians -}}
+# NodePort service exposing the librarians-{{ $index }} node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-{{ $index }}
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: {{ $localPort }}
+    nodePort: {{ $librarian.PublicPort }}
+  selector:
+    hostname: librarians-{{ $index }}
+---
+# PersistentVolume for librarian {{ $index }}'s /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-{{ $index }}
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: {{ $diskSize }}Gi
+  accessModes: ["ReadWriteOnce"]
+  {{ if $gcpCluster -}}
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-{{ $index }}"
+  {{ end -}}
+  {{ if $localCluster -}}
+  hostPath:
+    path: "/data/data-librarians-{{ $index }}"
+  reclaimPolicy: ""
+  {{ end }}
+---
+# PersistentVolumeClaim for librarian {{ $index }}'s PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-{{ $index }}
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ $diskSize }}Gi
+---
+{{ end -}}
+# StatefulSet of {{ .Librarians | len }} librarians
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: librarians
+spec:
+  serviceName: libri
+  replicas: {{ .Librarians | len }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: libri
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ $localMetricsPort }}"
+    spec:
+      containers:
+      - name: libriarian
+        image: daedalus2718/libri:{{ $libriVersion }}
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - >
+            libri librarian start
+            --nSubscriptions 2
+            --dataDir /data
+            --localPort {{ $localPort }}
+            --localMetricsPort {{ $localMetricsPort }}
+            --publicHost $(wget -q -O - 'http://ipv4.myexternalip.com/raw')
+            --publicPort $(HN=$(hostname) && echo $((30100 + ${HN##*-})))
+            --bootstraps 'librarians-0.libri.default.svc.cluster.local:{{ $localPort }},librarians-3.libri.default.svc.cluster.local:{{ $localPort }}'
+            --profile
+        env:
+        - name: GODEBUG         # ensure we use the pure Go (rather than CGO) DNS
+          value: netdns=go      # resolver (see https://golang.org/src/net/net.go)
+        - name: LIBRI_LOCALHOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - containerPort: {{ $localPort }}
+        - containerPort: {{ $localMetricsPort }}
+        livenessProbe:
+          exec:
+            command: [
+              "sh", "-c",
+              "libri", "test", "health",
+              "-a", "$(hostname).libri.default.svc.cluster.local:{{ $localPort }}"
+            ]
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        resources:
+          limits:
+            memory: {{ $ramLimit }}
+            cpu: {{ $cpuLimit }}
+
+      initContainers:
+      - image: devth/k8s-labeler
+        name: labeler
+        env:
+        - name: KUBE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBE_LABEL_hostname  # used to identify individual pods to each NodePort service
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data
+
+  volumeClaimTemplates:
+  - metadata:
+      name: data

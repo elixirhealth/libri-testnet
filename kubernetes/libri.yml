@@ -1,0 +1,477 @@
+
+# This file is generated from service.yml.template. Please edit that instead and regenerate.
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: libri-experimenter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: User
+  name: libri-admin@elixir-deploy-staging-1.iam.gserviceaccount.com
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: default-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+---
+# headless service for internal DNS networking
+kind: Service
+apiVersion: v1
+metadata:
+  name: libri
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  clusterIP: None
+  ports:
+  - port: 20100
+  selector:
+    app: libri
+---
+# NodePort service exposing the librarians-0 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-0
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30100
+  selector:
+    hostname: librarians-0
+---
+# PersistentVolume for librarian 0's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-0
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-0"
+  
+---
+# PersistentVolumeClaim for librarian 0's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-0
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-1 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-1
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30101
+  selector:
+    hostname: librarians-1
+---
+# PersistentVolume for librarian 1's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-1
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-1"
+  
+---
+# PersistentVolumeClaim for librarian 1's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-1
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-2 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-2
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30102
+  selector:
+    hostname: librarians-2
+---
+# PersistentVolume for librarian 2's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-2
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-2"
+  
+---
+# PersistentVolumeClaim for librarian 2's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-2
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-3 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-3
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30103
+  selector:
+    hostname: librarians-3
+---
+# PersistentVolume for librarian 3's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-3
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-3"
+  
+---
+# PersistentVolumeClaim for librarian 3's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-3
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-4 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-4
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30104
+  selector:
+    hostname: librarians-4
+---
+# PersistentVolume for librarian 4's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-4
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-4"
+  
+---
+# PersistentVolumeClaim for librarian 4's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-4
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-5 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-5
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30105
+  selector:
+    hostname: librarians-5
+---
+# PersistentVolume for librarian 5's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-5
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-5"
+  
+---
+# PersistentVolumeClaim for librarian 5's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-5
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-6 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-6
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30106
+  selector:
+    hostname: librarians-6
+---
+# PersistentVolume for librarian 6's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-6
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-6"
+  
+---
+# PersistentVolumeClaim for librarian 6's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-6
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NodePort service exposing the librarians-7 node to the outside world
+kind: Service
+apiVersion: v1
+metadata:
+  name: librarians-7
+  annotations:
+    prometheus.io/scrape: "false"  # we get stats from individual pods
+spec:
+  type: NodePort
+  ports:
+  - port: 20100
+    nodePort: 30107
+  selector:
+    hostname: librarians-7
+---
+# PersistentVolume for librarian 7's /data dir
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-librarians-7
+  labels:
+    app: libri
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: ["ReadWriteOnce"]
+  gcePersistentDisk:
+      fsType: "ext4"
+      pdName: "data-librarians-7"
+  
+---
+# PersistentVolumeClaim for librarian 7's PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-librarians-7
+  labels:
+    app: libri
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# StatefulSet of 8 librarians
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: librarians
+spec:
+  serviceName: libri
+  replicas: 8
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: libri
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "20200"
+    spec:
+      containers:
+      - name: libriarian
+        image: daedalus2718/libri:snapshot-c85ba4c
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - >
+            libri librarian start
+            --nSubscriptions 2
+            --dataDir /data
+            --localPort 20100
+            --localMetricsPort 20200
+            --publicHost $(wget -q -O - 'http://ipv4.myexternalip.com/raw')
+            --publicPort $(HN=$(hostname) && echo $((30100 + ${HN##*-})))
+            --bootstraps 'librarians-0.libri.default.svc.cluster.local:20100,librarians-3.libri.default.svc.cluster.local:20100'
+            --profile
+        env:
+        - name: GODEBUG         # ensure we use the pure Go (rather than CGO) DNS
+          value: netdns=go      # resolver (see https://golang.org/src/net/net.go)
+        - name: LIBRI_LOCALHOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - containerPort: 20100
+        - containerPort: 20200
+        livenessProbe:
+          exec:
+            command: [
+              "sh", "-c",
+              "libri", "test", "health",
+              "-a", "$(hostname).libri.default.svc.cluster.local:20100"
+            ]
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        resources:
+          limits:
+            memory: 2G
+            cpu: 100m
+
+      initContainers:
+      - image: devth/k8s-labeler
+        name: labeler
+        env:
+        - name: KUBE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBE_LABEL_hostname  # used to identify individual pods to each NodePort service
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data
+
+  volumeClaimTemplates:
+  - metadata:
+      name: data
