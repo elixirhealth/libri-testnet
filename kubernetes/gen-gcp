@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${DIR}/../../terraform/env.sh
+pushd ${DIR} > /dev/null 2>&1
+
+go run *.go \
+    --gcpCluster \
+    --nLibrarians=${TF_VAR_n_librarians} \
+    --diskSize=${TF_VAR_librarian_disk_size} \
+    --publicPortStart=${TF_VAR_public_port_start}
+
+popd > /dev/null 2>&1

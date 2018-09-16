@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+TERRAFORM_DIR="terraform"
+PLAN_FILE="terraform.tfplan"
+
+source terraform/env.sh
+
+# decrypt secrets
+echo -n "Decrypting secrets ... "
+./secrets decrypt
+echo -e "done\n"
+
+pushd ${TERRAFORM_DIR} > /dev/null 2>&1
+terraform plan -out=${PLAN_FILE}
+
+echo -en "\nAbove are the planned changes. Do you want to apply them now? [y/N]: "
+read do_apply
+
+if [[ ${do_apply} = "y" ]]; then
+    terraform apply ${PLAN_FILE}
+else
+    echo "Skipped apply."
+fi
+
+rm ${PLAN_FILE}
+popd > /dev/null 2>&1
+
+# clean up
+./secrets clean
+echo "Deleted plaintext secrets."
