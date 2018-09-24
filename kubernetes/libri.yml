@@ -4,19 +4,6 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: libri-experimenter
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: User
-  name: libri-admin@elixir-deploy-staging-1.iam.gserviceaccount.com
-  namespace: default
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
   name: default-sa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -63,9 +50,11 @@ metadata:
   name: data-librarians-0
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -80,10 +69,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-0
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-1 node to the outside world
 kind: Service
@@ -107,9 +98,11 @@ metadata:
   name: data-librarians-1
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -124,10 +117,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-1
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-2 node to the outside world
 kind: Service
@@ -151,9 +146,11 @@ metadata:
   name: data-librarians-2
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -168,10 +165,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-2
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-3 node to the outside world
 kind: Service
@@ -195,9 +194,11 @@ metadata:
   name: data-librarians-3
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -212,10 +213,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-3
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-4 node to the outside world
 kind: Service
@@ -239,9 +242,11 @@ metadata:
   name: data-librarians-4
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -256,10 +261,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-4
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-5 node to the outside world
 kind: Service
@@ -283,9 +290,11 @@ metadata:
   name: data-librarians-5
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -300,10 +309,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-5
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-6 node to the outside world
 kind: Service
@@ -327,9 +338,11 @@ metadata:
   name: data-librarians-6
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -344,10 +357,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-6
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # NodePort service exposing the librarians-7 node to the outside world
 kind: Service
@@ -371,9 +386,11 @@ metadata:
   name: data-librarians-7
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
-    storage: 10Gi
+    storage: 25Gi
   accessModes: ["ReadWriteOnce"]
   gcePersistentDisk:
       fsType: "ext4"
@@ -388,10 +405,12 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-7
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 10Gi
+      storage: 25Gi
 ---
 # StatefulSet of 8 librarians
 apiVersion: apps/v1beta1
@@ -413,7 +432,7 @@ spec:
     spec:
       containers:
       - name: libriarian
-        image: daedalus2718/libri:snapshot-c85ba4c
+        image: daedalus2718/libri:snapshot-9944f62
         command: ["/bin/sh"]
         args:
           - "-c"
