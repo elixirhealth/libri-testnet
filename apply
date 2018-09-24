@@ -27,6 +27,19 @@ fi
 rm ${PLAN_FILE}
 popd > /dev/null 2>&1
 
+echo -e "\nDo you want to also apply Kubernetes changes via the following?"
+echo -e "\n\t./kubernetes/apply"
+echo -en "\n Answer [y/N]: "
+read do_k8s
+
+if [[ ${do_k8s} = "y" ]]; then
+    echo
+    ./kubernetes/apply
+    echo
+else
+    echo "Skipped Kubernetes apply."
+fi
+
 # clean up
 ./secrets clean
 echo "Deleted plaintext secrets."

@@ -12,19 +12,6 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: libri-experimenter
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: User
-  name: libri-admin@elixir-deploy-staging-1.iam.gserviceaccount.com
-  namespace: default
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
   name: default-sa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -72,6 +59,8 @@ metadata:
   name: data-librarians-{{ $index }}
   labels:
     app: libri
+  annotations:
+    backup.kubernetes.io/deltas: PT1H P1D P7D P30D
 spec:
   capacity:
     storage: {{ $diskSize }}Gi
@@ -95,6 +84,8 @@ metadata:
   labels:
     app: libri
 spec:
+  storageClassName: ""
+  volumeName: data-librarians-{{ $index }}
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
