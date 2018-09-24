@@ -17,14 +17,15 @@ resource "google_container_cluster" "primary" {
   }
 }
 
+
 resource "google_container_node_pool" "n1-highmem-2" {
   name    = "n1-highmem-2"
   cluster = "${google_container_cluster.primary.id}"
 
   node_config {
-    machine_type = "n1-highmem-2"
+    machine_type = "n1-highmem-2" # 2 CPUs, 6.5 GB RAM per node
     disk_size_gb = "${var.node_disk_size}"
   }
 
-  node_count = 2
+  node_count = 4
 }
